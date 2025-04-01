@@ -44,4 +44,3 @@ jobs:
           script: |
             docker-compose build ${{ secrets.DOCKERHUB_USERNAME }}/docker-vps-deploy:${{ github.sha }}
             docker-compose up --no-deps -d ${{ secrets.DOCKERHUB_USERNAME }}/docker-vps-deploy:${{ github.sha }}
-            docker system prune -af
