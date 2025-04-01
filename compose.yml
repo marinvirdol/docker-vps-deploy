@@ -1,6 +1,7 @@
 services:
   app:
     image: codemachinedev/docker-vps-deploy
+    restart: always
     ports:
       - 3000:3000
     secrets:
