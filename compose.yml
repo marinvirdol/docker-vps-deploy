@@ -1,17 +1,15 @@
 services:
   app:
-    image: codemachinedev/docker-vps-deploy
+    image: ${DOCKERHUB_USERNAME}/docker-vps-deploy:${IMAGE_TAG}
     restart: always
     ports:
       - 3000:3000
-    secrets:
-      - db-password
     environment:
       - NODE_ENV=production
       - POSTGRES_HOST=db
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
-      - POSTGRES_DB=guestbook
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
       - POSTGRES_PORT=5432
       - POSTGRES_SSLMODE=disable
     depends_on:
@@ -27,13 +25,11 @@ services:
     image: postgres:17-alpine
     restart: always
     user: postgres
-    secrets:
-      - db-password
     volumes:
       - db-data:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: guestbook
-      POSTGRES_PASSWORD_FILE: /run/secrets/db-password
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     expose:
       - 5432
     healthcheck:
@@ -44,7 +40,3 @@ services:
 
 volumes:
   db-data:
-
-secrets:
-  db-password:
-    file: ./db/password.txt
