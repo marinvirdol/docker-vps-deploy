@@ -1,0 +1,16 @@
+services:
+  vpsdb:
+    image: postgres:17-alpine
+    restart: always
+    user: postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: todos
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Ppassword1!
+    ports:
+      - 5432:5432
+
+volumes:
+  db-data:

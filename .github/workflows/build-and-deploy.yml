@@ -55,12 +55,18 @@ jobs:
 
       - name: Deploy to VPS with docker compose
         run: |
-          # Create .env file with environment variables
-          echo "DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}" > .env
+          # Create .env file from env.example and set values from secrets
+          cp env.example .env
+          sed -i "s/DB_USER=.*/DB_USER=${{ secrets.DB_USER }}/" .env
+          sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=${{ secrets.DB_PASSWORD }}/" .env
+          sed -i "s/DB_HOST=.*/DB_HOST=${{ secrets.DB_HOST }}/" .env
+          sed -i "s/DB_PORT=.*/DB_PORT=${{ secrets.DB_PORT }}/" .env
+          sed -i "s/DB_NAME=.*/DB_NAME=${{ secrets.DB_NAME }}/" .env
+          sed -i "s/DB_URL=.*/DB_URL=${{ secrets.DB_URL }}/" .env
+
+          # Add DOCKERHUB_USERNAME and IMAGE_TAG to .env
+          echo "DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}" >> .env
           echo "IMAGE_TAG=${{ github.sha }}" >> .env
-          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
-          echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
-          echo "DB_USER=${{ secrets.DB_USER }}" >> .env
 
           # Deploy using Docker Compose with the remote context
           docker compose up -d
