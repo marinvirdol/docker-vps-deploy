@@ -29,6 +29,10 @@ RUN pnpm build
 FROM base AS runner
 WORKDIR /app
 
+# Accept build argument
+ARG DB_URL
+ENV DB_URL=$DB_URL
+
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 

@@ -30,6 +30,8 @@ jobs:
           platforms: linux/arm64/v8
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/docker-vps-deploy:latest, ${{ secrets.DOCKERHUB_USERNAME }}/docker-vps-deploy:${{ github.sha }}
+          build-args: |
+            DB_URL=${{ secrets.DB_URL }}
 
   deploy:
     needs: build-and-push-docker-image
