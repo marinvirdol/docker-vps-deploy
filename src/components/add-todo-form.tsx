@@ -17,11 +17,6 @@ import {
   FormItem,
 } from "@codemachine/components/ui/form";
 
-type FormErrors = {
-  title?: string[];
-  _form?: string[];
-};
-
 type AddTodoResult = {
   success: boolean;
   errors?: {
