@@ -3,6 +3,10 @@ import { deleteTodoAction } from "@codemachine/actions/delete-todo";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import { useTransition } from "react";
+import { useForm } from "react-hook-form";
+import { DeletedTodo } from "@codemachine/db/schema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { deleteTodoSchema } from "@codemachine/db/schema";
 
 interface DeleteTodoFormProps {
   id: number;
@@ -11,13 +15,16 @@ interface DeleteTodoFormProps {
 export function DeleteTodoForm({ id }: DeleteTodoFormProps) {
   const [isPending, startTransition] = useTransition();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const formData = new FormData();
-    formData.append("id", id.toString());
+  const deleteForm = useForm<DeletedTodo>({
+    resolver: zodResolver(deleteTodoSchema),
+    defaultValues: {
+      id: id,
+    },
+  });
 
+  const handleSubmit = (values: DeletedTodo) => {
     startTransition(async () => {
-      const result = await deleteTodoAction(null, formData);
+      const result = await deleteTodoAction(values);
       if (result.error) {
         toast.error(result.error);
       } else if (result.success) {
@@ -27,7 +34,7 @@ export function DeleteTodoForm({ id }: DeleteTodoFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={deleteForm.handleSubmit(handleSubmit)}>
       <input type="hidden" name="id" value={id} />
       <Button variant="ghost" size="sm" type="submit" disabled={isPending}>
         {isPending ? "Deleting..." : "Delete"}

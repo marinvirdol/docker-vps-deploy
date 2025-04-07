@@ -1,15 +1,11 @@
 "use server";
 
 import { db } from "@codemachine/db";
-import { insertTodoSchema, todos } from "@codemachine/db/schema";
+import { insertTodoSchema, todos, NewTodo } from "@codemachine/db/schema";
 import { revalidatePath } from "next/cache";
 
-export async function addTodoAction(_: unknown, formData: FormData) {
-  const title = formData.get("title");
-
-  console.log({ title });
-
-  const validationResult = insertTodoSchema.safeParse({ title });
+export async function addTodoAction(values: NewTodo) {
+  const validationResult = insertTodoSchema.safeParse(values);
 
   if (!validationResult.success) {
     return {
@@ -17,8 +13,6 @@ export async function addTodoAction(_: unknown, formData: FormData) {
       errors: validationResult.error.flatten().fieldErrors,
     };
   }
-
-  console.log({ validationResult });
 
   try {
     const todo = await db

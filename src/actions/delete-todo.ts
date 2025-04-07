@@ -1,29 +1,21 @@
 "use server";
 
 import { db } from "@codemachine/db";
-import { deleteTodoSchema, todos } from "@codemachine/db/schema";
+import { deleteTodoSchema, todos, DeletedTodo } from "@codemachine/db/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
-export async function deleteTodoAction(_: unknown, formData: FormData) {
-  const id = formData.get("id");
-  const idNumber = id ? Number(id) : null;
+export async function deleteTodoAction(values: DeletedTodo) {
+  const id = values.id;
 
-  console.log("id", idNumber);
-
-  const validationResult = deleteTodoSchema.safeParse({ id: idNumber });
+  const validationResult = deleteTodoSchema.safeParse({ id });
 
   if (!validationResult.success) {
-    console.log(
-      "validationResult",
-      validationResult.error.flatten().fieldErrors
-    );
     return {
       success: false,
       errors: validationResult.error.flatten().fieldErrors,
     };
   }
-  console.log("remove todo", id, validationResult.data.id);
 
   try {
     await db.delete(todos).where(eq(todos.id, validationResult.data.id));

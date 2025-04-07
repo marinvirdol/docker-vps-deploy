@@ -1,17 +1,11 @@
-import { Button } from "@codemachine/components/ui/button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from "@codemachine/components/ui/card";
-import { Checkbox } from "@codemachine/components/ui/checkbox";
 import { getTodos } from "@codemachine/actions/get-todos";
 import { AddTodoForm } from "@codemachine/components/add-todo-form";
-import { Todo } from "@codemachine/db/schema";
-import { toggleTodoAction } from "@codemachine/actions/toggle-todo";
-import { deleteTodoAction } from "@codemachine/actions/delete-todo";
-import { DeleteTodoForm } from "@codemachine/components/delete-todo-form";
 import { TodoItem } from "@codemachine/components/todo-item";
 
 export default async function TodoApp() {

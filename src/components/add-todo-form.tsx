@@ -1,87 +1,114 @@
 "use client";
 
-import { useActionState, useRef, useState } from "react";
+import { useTransition } from "react";
 import { PlusCircle } from "lucide-react";
 import { Button } from "@codemachine/components/ui/button";
 import { Input } from "@codemachine/components/ui/input";
 import { toast } from "sonner";
 import { addTodoAction } from "@codemachine/actions/add-todo";
-import { useFormStatus } from "react-dom";
+import { NewTodo, insertTodoSchema } from "@codemachine/db/schema";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormMessage,
+  FormItem,
+} from "@codemachine/components/ui/form";
 
 type FormErrors = {
   title?: string[];
   _form?: string[];
 };
 
+type AddTodoResult = {
+  success: boolean;
+  errors?: {
+    title?: string[];
+    _form?: string[];
+  };
+  todo?: {
+    id: number;
+    title: string;
+    completed: boolean;
+    createdAt: Date;
+  };
+};
+
 export function AddTodoForm() {
-  const [addTodoResponse, addTodo, isPending] = useActionState(
-    addTodoAction,
-    null
-  );
-  const formRef = useRef<HTMLFormElement>(null);
-  const [errors, setErrors] = useState<FormErrors>({});
+  const [isPending, startTransition] = useTransition();
 
-  // async function clientAction(formData: FormData) {
-  //   setErrors({}); // Clear previous errors
-  //   console.log(formData);
-  //   const result = await addTodoAction(formData);
+  const addForm = useForm<NewTodo>({
+    resolver: zodResolver(insertTodoSchema),
+    defaultValues: {
+      title: "",
+    },
+  });
 
-  //   if ("success" in result && !result.success) {
-  //     const errorFields = result.errors || {};
-  //     setErrors({
-  //       title: "title" in errorFields ? errorFields.title : undefined,
-  //       _form: "_form" in errorFields ? errorFields._form : undefined,
-  //     });
+  // Client-side handler for add todo action
+  const handleSubmit = (values: NewTodo) => {
+    startTransition(async () => {
+      const result: AddTodoResult = await addTodoAction(values);
 
-  //     // Show toast for the first error
-  //     if ("title" in errorFields && errorFields.title?.[0]) {
-  //       toast.error(errorFields.title[0]);
-  //     } else if ("_form" in errorFields && errorFields._form?.[0]) {
-  //       toast.error(errorFields._form[0]);
-  //     }
-  //     return;
-  //   }
+      if (!result.success) {
+        if (result.errors?.title) {
+          toast.error("Validation Error", {
+            description: result.errors.title[0],
+          });
+        } else if (result.errors?._form) {
+          toast.error("Error", {
+            description: result.errors._form[0],
+          });
+        }
+      } else {
+        toast.success("Success", {
+          description: "Todo added successfully",
+        });
 
-  //   // Reset the form on success
-  //   formRef.current?.reset();
-
-  //   // Show success toast
-  //   toast.success("Todo added successfully");
-  // }
+        // Reset the form on success
+        addForm.reset();
+      }
+    });
+  };
 
   return (
-    <form ref={formRef} action={addTodo} className="flex flex-col space-y-2">
-      <div className="flex space-x-2">
-        <div className="flex-1">
-          <Input
-            name="title"
-            placeholder="Add a new task..."
-            aria-invalid={!!errors.title}
-            aria-describedby={errors.title ? "title-error" : undefined}
-          />
-          {errors.title && (
-            <p id="title-error" className="text-sm text-destructive mt-1">
-              {errors.title[0]}
-            </p>
-          )}
+    <Form {...addForm}>
+      <form
+        onSubmit={addForm.handleSubmit(handleSubmit)}
+        className="flex flex-col space-y-2"
+      >
+        <div className="flex space-x-2">
+          <div className="flex-1">
+            <FormField
+              control={addForm.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder="Add a new task..."
+                      aria-invalid={!!addForm.formState.errors.title}
+                      aria-describedby={
+                        addForm.formState.errors.title
+                          ? "title-error"
+                          : undefined
+                      }
+                      disabled={isPending}
+                    />
+                  </FormControl>
+                  <FormMessage className="text-xs mt-1" />
+                </FormItem>
+              )}
+            />
+          </div>
+          <Button type="submit" disabled={isPending}>
+            <PlusCircle className="h-4 w-4 mr-2" />
+            {isPending ? "Adding..." : "Add"}
+          </Button>
         </div>
-        <SubmitButton />
-      </div>
-
-      {errors._form && (
-        <p className="text-sm text-destructive">{errors._form[0]}</p>
-      )}
-    </form>
-  );
-}
-
-function SubmitButton() {
-  const { pending } = useFormStatus();
-
-  return (
-    <Button type="submit" disabled={pending}>
-      <PlusCircle className="h-4 w-4 mr-2" />
-      {pending ? "Adding..." : "Add"}
-    </Button>
+      </form>
+    </Form>
   );
 }
