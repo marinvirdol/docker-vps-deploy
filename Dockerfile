@@ -15,6 +15,13 @@ RUN pnpm install --frozen-lockfile
 FROM base AS builder
 WORKDIR /app
 
+# Copy .env file and set build arguments
+ARG DB_URL
+ENV DB_URL=$DB_URL
+
+# Create a temporary .env file with the build argument
+RUN echo "DB_URL=$DB_URL" > .env
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
