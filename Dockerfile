@@ -15,13 +15,23 @@ RUN pnpm install --frozen-lockfile
 FROM base AS builder
 WORKDIR /app
 
-# Copy .env file and set build arguments
+# Set build arguments
 ARG DB_URL
-ENV DB_URL=$DB_URL
 
-# Create a temporary .env file with the build argument
-RUN echo "DB_URL=$DB_URL" > .env
+# Debug: Print build argument
+RUN echo "DB_URL build argument: $DB_URL"
 
+# Create .env file with the build argument before copying source code
+RUN echo "DB_URL=$DB_URL" > .env && \
+    echo "NODE_ENV=production" >> .env
+
+# Debug: Print .env file contents
+RUN echo "Contents of .env file:" && cat .env
+
+# Debug: Print environment variables
+RUN echo "Environment variables:" && env | grep -E "DB_URL|NODE_ENV"
+
+# Copy source files
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
@@ -39,6 +49,9 @@ WORKDIR /app
 # Accept build argument
 ARG DB_URL
 ENV DB_URL=$DB_URL
+
+# Debug: Print final environment variables in runner stage
+RUN echo "Runner stage environment variables:" && env | grep -E "DB_URL|NODE_ENV"
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
