@@ -1,15 +1,12 @@
-import "dotenv/config";
 import { drizzle } from "drizzle-orm/node-postgres";
+import getConfig from "next/config";
 
-const dbUrl = process.env.DB_URL;
-
-if (!dbUrl) {
-  throw new Error("DB_URL is not set");
-}
+const { serverRuntimeConfig } = getConfig();
+const dbUrl = serverRuntimeConfig.dbUrl;
 
 export const db = drizzle({
   connection: {
-    connectionString: process.env.DB_URL,
+    connectionString: dbUrl,
     // ssl: true,
   },
 });

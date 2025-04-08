@@ -31,14 +31,6 @@ jobs:
           platforms: linux/arm64/v8
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/docker-vps-deploy:latest, ${{ secrets.DOCKERHUB_USERNAME }}/docker-vps-deploy:${{ github.sha }}
-          build-args: |
-            DB_URL=${{ secrets.DB_URL }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          load: true
-          no-cache: true
-          pull: true
-          progress: plain
 
   deploy:
     needs: build-and-push-docker-image
@@ -75,7 +67,11 @@ jobs:
           sed -i "s/DB_URL=.*/DB_URL=${{ secrets.DB_URL }}/" .env
 
           # Deploy using Docker Compose with the remote context
-          DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }} IMAGE_TAG=${{ github.sha }} docker compose --env-file .env up -d
+          DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }} \
+          IMAGE_TAG=${{ github.sha }} \
+          DB_URL=${{ secrets.DB_URL }} \
+          NODE_ENV=production \
+          docker compose --env-file .env up -d
 
           # Clean up
           docker system prune -af --force
