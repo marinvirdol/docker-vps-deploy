@@ -68,12 +68,12 @@ jobs:
           sed -i "s|DB_NAME=.*|DB_NAME=${{ secrets.DB_NAME }}|" .env
           sed -i "s|DB_URL=.*|DB_URL=${{ secrets.DB_URL }}|" .env
 
-          # Add additional required variables to .env
-          echo "DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}" >> .env
-          echo "IMAGE_TAG=${{ github.sha }}" >> .env
+          # Add NODE_ENV to .env
           echo "NODE_ENV=production" >> .env
 
           # Deploy using Docker Compose with the remote context
+          DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }} \
+          IMAGE_TAG=${{ github.sha }} \
           docker compose --env-file .env up -d
 
           # Clean up
