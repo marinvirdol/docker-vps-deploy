@@ -32,6 +32,12 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/docker-vps-deploy:latest, ${{ secrets.DOCKERHUB_USERNAME }}/docker-vps-deploy:${{ github.sha }}
           build-args: |
             DB_URL=${{ secrets.DB_URL }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          load: true
+          no-cache: true
+          pull: true
+          progress: plain
 
   deploy:
     needs: build-and-push-docker-image
