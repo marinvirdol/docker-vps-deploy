@@ -71,6 +71,10 @@ jobs:
           # Add NODE_ENV to .env
           echo "NODE_ENV=production" >> .env
 
+          # Print the contents of .env file
+          echo "Contents of .env file:"
+          cat .env
+
           # Deploy using Docker Compose with the remote context
           DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }} \
           IMAGE_TAG=${{ github.sha }} \
