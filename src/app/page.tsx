@@ -9,7 +9,9 @@ import { AddTodoForm } from "@codemachine/components/add-todo-form";
 import { TodoItem } from "@codemachine/components/todo-item";
 
 export default async function TodoApp() {
-  const todos = await getTodos();
+  const response = await getTodos();
+
+  console.log("todos", response);
 
   return (
     <div className="container mx-auto py-10 px-4">
@@ -22,16 +24,24 @@ export default async function TodoApp() {
         <CardContent>
           <div className="space-y-4">
             <AddTodoForm />
-
-            <div className="space-y-2">
-              {todos.length === 0 ? (
-                <p className="text-center text-muted-foreground py-4">
-                  No tasks yet. Add one above!
-                </p>
-              ) : (
-                todos.map((todo) => <TodoItem key={todo.id} todo={todo} />)
-              )}
-            </div>
+            {!response.success && (
+              <p className="text-center text-muted-foreground py-4">
+                {response.error}
+              </p>
+            )}
+            {response.success && (
+              <div className="space-y-2">
+                {response?.todos?.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-4">
+                    No tasks yet. Add one above!
+                  </p>
+                ) : (
+                  response?.todos?.map((todo) => (
+                    <TodoItem key={todo.id} todo={todo} />
+                  ))
+                )}
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

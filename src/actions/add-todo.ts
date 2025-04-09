@@ -5,6 +5,7 @@ import { insertTodoSchema, todos, NewTodo } from "@codemachine/db/schema";
 import { revalidatePath } from "next/cache";
 
 export async function addTodoAction(values: NewTodo) {
+  console.log("addTodoAction", process.env.DB_URL);
   const validationResult = insertTodoSchema.safeParse(values);
 
   if (!validationResult.success) {
