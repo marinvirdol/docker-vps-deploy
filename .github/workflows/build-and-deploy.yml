@@ -65,7 +65,6 @@ jobs:
           DB_URL=${{ secrets.DB_URL }}
 
           # Configuration variables (from GitHub vars)
-          DB_HOST=${{ vars.DB_HOST }}
           DB_PORT=${{ vars.DB_PORT }}
           DB_NAME=${{ vars.DB_NAME }}
           NODE_ENV=${{ vars.NODE_ENV }}
