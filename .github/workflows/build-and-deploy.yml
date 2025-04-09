@@ -59,15 +59,19 @@ jobs:
         run: |
           # Create .env file with all required variables
           cat > .env << EOF
+          # Database secrets (from GitHub secrets)
           DB_USER=${{ secrets.DB_USER }}
           DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-          DB_HOST=${{ secrets.DB_HOST }}
-          DB_PORT=${{ secrets.DB_PORT }}
-          DB_NAME=${{ secrets.DB_NAME }}
           DB_URL=${{ secrets.DB_URL }}
+
+          # Configuration variables (from GitHub vars)
+          DB_HOST=${{ vars.DB_HOST }}
+          DB_PORT=${{ vars.DB_PORT }}
+          DB_NAME=${{ vars.DB_NAME }}
+          NODE_ENV=${{ vars.NODE_ENV }}
+
           DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
           IMAGE_TAG=${{ github.sha }}
-          NODE_ENV=production
           EOF
 
           # Print the contents of .env file
