@@ -68,8 +68,8 @@ jobs:
           sed -i "s|DB_NAME=.*|DB_NAME=${{ secrets.DB_NAME }}|" .env
           sed -i "s|DB_URL=.*|DB_URL=${{ secrets.DB_URL }}|" .env
 
-          # Add NODE_ENV to .env
-          echo "NODE_ENV=production" >> .env
+          # Add NODE_ENV to .env on a new line
+          printf "\nNODE_ENV=production\n" >> .env
 
           # Print the contents of .env file
           echo "Contents of .env file:"
