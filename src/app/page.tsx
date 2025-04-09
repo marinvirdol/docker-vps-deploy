@@ -15,7 +15,7 @@ export default async function TodoApp() {
     <div className="container mx-auto py-10 px-4">
       <Card className="max-w-md mx-auto">
         <CardHeader>
-          <CardTitle className="text-2xl text-center">Todo App</CardTitle>
+          <CardTitle className="text-2xl text-center">Todo App 2</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
