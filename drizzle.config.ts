@@ -7,6 +7,6 @@ export default defineConfig({
   dialect: "postgresql",
   dbCredentials: {
     // url: process.env.DB_URL!,
-    url: "postgresql://postgres:MyPassword123@localhost:5432/todos",
+    url: "postgresql://postgres:MyPassword123@91.99.3.185:5432/todos",
   },
 });
