@@ -65,6 +65,8 @@ jobs:
           DB_PORT=${{ secrets.DB_PORT }}
           DB_NAME=${{ secrets.DB_NAME }}
           DB_URL=${{ secrets.DB_URL }}
+          DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+          IMAGE_TAG=${{ github.sha }}
           NODE_ENV=production
           EOF
 
@@ -73,8 +75,6 @@ jobs:
           cat .env
 
           # Deploy using Docker Compose with the remote context
-          DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }} \
-          IMAGE_TAG=${{ github.sha }} \
           docker compose --env-file .env up -d
 
           # Clean up
