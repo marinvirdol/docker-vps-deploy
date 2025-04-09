@@ -1,5 +1,5 @@
 services:
-  vpsdb:
+  db:
     image: postgres:17-alpine
     restart: always
     user: postgres

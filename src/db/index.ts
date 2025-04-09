@@ -1,14 +1,10 @@
 import { drizzle } from "drizzle-orm/node-postgres";
-import getConfig from "next/config";
 
-const { serverRuntimeConfig } = getConfig();
-const dbUrl = serverRuntimeConfig.dbUrl;
-
-console.log("+++++++++++", dbUrl);
+console.log("+++++++++++", process.env.DB_URL);
 
 export const db = drizzle({
   connection: {
-    connectionString: dbUrl,
+    connectionString: process.env.DB_URL,
     // ssl: true,
   },
 });
