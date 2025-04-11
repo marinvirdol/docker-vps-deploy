@@ -93,8 +93,18 @@ jobs:
 
       - name: Run database migrations
         run: |
-          # Wait for the database to be ready
-          sleep 10
+          # Create SSH tunnel in the background
+          ssh -o StrictHostKeyChecking=no -L 5432:localhost:5432 ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -N &
+          TUNNEL_PID=$!
 
-          # Run Drizzle migrations
-          npm run db:migrate
+          # Wait for tunnel to be established
+          sleep 5
+
+          # Set DB_URL to use local tunnel
+          export DB_URL="postgresql://postgres:${{ secrets.DB_PASSWORD }}@localhost:5432/todos"
+
+          # Push schema changes
+          npx drizzle-kit push:pg
+
+          # Clean up SSH tunnel
+          kill $TUNNEL_PID
