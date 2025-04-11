@@ -8,7 +8,10 @@
     "start": "next start",
     "lint": "next lint",
     "docker:build": "docker build --platform linux/arm64/v8 -t codemachinedev/docker-vps-deploy .",
-    "drizzle:studio": "drizzle-kit studio"
+    "drizzle:studio": "drizzle-kit studio",
+    "db:generate": "drizzle-kit generate:pg",
+    "db:migrate": "tsx src/db/migrate.ts",
+    "db:push": "drizzle-kit push:pg"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",

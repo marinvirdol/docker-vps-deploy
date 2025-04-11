@@ -6,7 +6,7 @@ services:
       - 3000:3000
     environment:
       - NODE_ENV=production
-      - DB_URL=postgresql://postgres:MyPassword123@91.99.3.185:5432/todos
+      - DB_URL=postgresql://postgres:MyPassword123@db:5432/todos
       # - DB_URL=${DB_URL}
     depends_on:
       db:
