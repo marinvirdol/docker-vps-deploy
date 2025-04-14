@@ -104,7 +104,7 @@ jobs:
           export DB_URL="postgresql://postgres:${{ secrets.DB_PASSWORD }}@localhost:5432/todos"
 
           # Push schema changes
-          npx drizzle-kit push:pg
+          npx drizzle-kit push
 
           # Clean up SSH tunnel
           kill $TUNNEL_PID
