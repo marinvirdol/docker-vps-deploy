@@ -101,10 +101,10 @@ jobs:
           sleep 5
 
           # Set DB_URL to use local tunnel
-          export DB_URL="${{ secrets.DB_URL }}"
+          export DB_URL="postgresql://postgres:${{ secrets.DB_PASSWORD }}@localhost:${{ vars.DB_PORT }}/${{ vars.DB_NAME }}"
 
           # Push schema changes
-          npx drizzle-kit push
+          npx drizzle-kit push:pg
 
           # Clean up SSH tunnel
           kill $TUNNEL_PID
