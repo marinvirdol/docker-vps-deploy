@@ -101,7 +101,7 @@ jobs:
           sleep 5
 
           # Set DB_URL to use local tunnel
-          export DB_URL="postgresql://postgres:${{ secrets.DB_PASSWORD }}@localhost:5432/todos"
+          export DB_URL="${{ secrets.DB_URL }}"
 
           # Push schema changes
           npx drizzle-kit push
