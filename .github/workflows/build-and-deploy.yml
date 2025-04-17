@@ -48,6 +48,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
       - name: Setup SSH key
         uses: webfactory/ssh-agent@v0.7.0
         with:
@@ -93,18 +98,47 @@ jobs:
 
       - name: Run database migrations
         run: |
-          # Create SSH tunnel in the background
-          ssh -o StrictHostKeyChecking=no -L 5432:localhost:5432 ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -N &
+          # Create SSH tunnel with better error handling
+          echo "Setting up SSH tunnel..."
+          ssh -v -o StrictHostKeyChecking=no -o ExitOnForwardFailure=yes -L 5432:localhost:5432 ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -N &
           TUNNEL_PID=$!
 
-          # Wait for tunnel to be established
-          sleep 5
+          # Wait for tunnel and test connection
+          echo "Waiting for tunnel to be established..."
+          sleep 10
+
+          # Test database connection
+          echo "Testing database connection..."
+          for i in {1..5}; do
+            if pg_isready -h localhost -p ${{ vars.DB_PORT }} -U postgres; then
+              echo "Database connection successful!"
+              break
+            fi
+            if [ $i -eq 5 ]; then
+              echo "Failed to connect to database after 5 attempts"
+              kill $TUNNEL_PID
+              exit 1
+            fi
+            echo "Attempt $i failed, retrying in 5 seconds..."
+            sleep 5
+          done
 
           # Set DB_URL to use local tunnel
           export DB_URL="postgresql://postgres:${{ secrets.DB_PASSWORD }}@localhost:${{ vars.DB_PORT }}/${{ vars.DB_NAME }}"
 
-          # Push schema changes
-          npx drizzle-kit push
+          # Debug: Print config location and connection info (without password)
+          echo "Config file location: $(pwd)/drizzle.config.ts"
+          echo "DB_URL (sanitized): $(echo $DB_URL | sed 's/:[^:@]*@/:\\*\\*\\*@/')"
+
+          # Debug: Check if schema file exists
+          echo "Schema file exists: $(test -f src/db/schema.ts && echo 'Yes' || echo 'No')"
+          echo "Schema file content:"
+          cat src/db/schema.ts
+
+          # Push schema changes with verbose logging
+          DEBUG=drizzle:* npx drizzle-kit push --verbose
 
           # Clean up SSH tunnel
-          kill $TUNNEL_PID
+          echo "Cleaning up SSH tunnel..."
+          kill $TUNNEL_PID || true
+          wait $TUNNEL_PID 2>/dev/null || true
