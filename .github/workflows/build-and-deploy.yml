@@ -100,7 +100,7 @@ jobs:
         run: |
           # Get the Docker container's IP address
           echo "Getting database container IP..."
-          DB_CONTAINER_IP=$(ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} 'docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" $(docker compose ps -q db)')
+          DB_CONTAINER_IP=$(docker --context vps-context inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" docker-vps-deploy-db-1)
           echo "Database container IP: $DB_CONTAINER_IP"
 
           # Create SSH tunnel with better error handling
